@@ -1,42 +1,51 @@
 <?php
-
 use yii\helpers\Html;
-use yii\grid\GridView;
-
 /* @var $this yii\web\View */
 /* @var $searchModel kouosl\forms\models\FormsSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
-
-$this->title = 'Forms';
+$this->title = 'FormBuilder';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="forms-index">
 
-    <h1><?= Html::encode($this->title) ?></h1>
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+<h1><?= Yii::t('app', 'FormBuilder') ?></h1>
 
-    <p>
-        <?= Html::a('Create Forms', ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
 
-    <?= GridView::widget([
+	<?= Html::a(Yii::t('app', 'Create form'), ['create'], ['class' => 'btn btn-success']) ?>
+	
+   <?= \yii\grid\GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
-
-            'form_id',
-            'body:ntext',
             'title',
-            'author',
-            'date_start',
-            //'date_end',
-            //'maximum',
-            //'meta_title',
-            //'url:url',
-            //'response:ntext',
+             [
+				'attribute' => 'url',
+				'format' => 'html',
+				'value' => function ($m, $key) {
+							return  Html::a ( $m->url, ['forms/view', 'url' => $m->url], ['target' => 'new']);
+						},
+			],
 
-            ['class' => 'yii\grid\ActionColumn'],
+            ['class' => 'yii\grid\ActionColumn',
+            
+            'buttons' => [
+		        'view' => function ($url, $model, $key) {
+					return Html::a ( '<span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> ', ['forms/view', 'url' => $model->url] );
+				},
+		        'list' => function ($url, $model, $key) {
+					return Html::a ( '<span class="glyphicon glyphicon-th-list" aria-hidden="true"></span> ', ['forms/list', 'id' => $model->form_id] );
+				},
+            ],
+			'template' => '{update} {view} {delete} {list}'
+            
+            
+            ],
         ],
     ]); ?>
-</div>
+    
+  
+
+
+
+
+    
