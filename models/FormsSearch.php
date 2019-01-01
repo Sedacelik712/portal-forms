@@ -1,7 +1,7 @@
 <?php
 
 namespace kouosl\forms\models;
-
+use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use kouosl\forms\models\Forms;
@@ -11,7 +11,7 @@ use kouosl\forms\models\Forms;
  */
 class FormsSearch extends Forms
 {
-    /**
+     /**
      * {@inheritdoc}
      */
     public function rules()
