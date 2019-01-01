@@ -19,6 +19,9 @@ kodlarınıza eklemeyi unutmayın:
 ANA SAYFA:
 http://portal.kouosl/forms/forms
 
+FORM CEVAPLARI:
+kouosl database de tablo oluşturup kaydedebiliyor.
+
 Ana sayfa:
 
 ![s](https://user-images.githubusercontent.com/38867574/50576102-8f254100-0e1b-11e9-9a68-d56889f5bc26.png)
