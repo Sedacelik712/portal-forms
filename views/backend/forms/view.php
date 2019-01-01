@@ -1,45 +1,16 @@
 <?php
-
 use yii\helpers\Html;
-use yii\widgets\DetailView;
+use yii\helpers\Url;
 
-/* @var $this yii\web\View */
-/* @var $model kouosl\forms\models\Forms */
-
-$this->title = $model->title;
-$this->params['breadcrumbs'][] = ['label' => 'Forms', 'url' => ['index']];
+$this->title = Yii::t('app', 'Form preview') ;
+$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Forms') , 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
-\yii\web\YiiAsset::register($this);
 ?>
-<div class="forms-view">
+<h1><?= Html::encode($this->title) ?>:</h1><hr>
 
-    <h1><?= Html::encode($this->title) ?></h1>
-
-    <p>
-        <?= Html::a('Update', ['update', 'id' => $model->form_id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Delete', ['delete', 'id' => $model->form_id], [
-            'class' => 'btn btn-danger',
-            'data' => [
-                'confirm' => 'Are you sure you want to delete this item?',
-                'method' => 'post',
-            ],
-        ]) ?>
-    </p>
-
-    <?= DetailView::widget([
-        'model' => $model,
-        'attributes' => [
-            'form_id',
-            'body:ntext',
-            'title',
-            'author',
-            'date_start',
-            'date_end',
-            'maximum',
-            'meta_title',
-            'url:url',
-            'response:ntext',
-        ],
-    ]) ?>
-
-</div>
+<?php
+echo \kouosl\forms\Form::widget([
+	'form' => $form,
+	'typeRender' => 'php'
+]);
+?>
