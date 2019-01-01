@@ -8,27 +8,57 @@ use kouosl\forms\models\FormsSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-
+use kouosl\forms\FormBase;
+use kouosl\forms\Form;
+use kouosl\forms\FormBuilder;
+use kouosl\forms\email\Send;
+use yii\helpers\Url;
+use yii\web\Response;
+use yii\helpers\Json;
+use yii\helpers\ArrayHelper;
 /**
  * FormsController implements the CRUD actions for Forms model.
  */
-class FormsController extends \kouosl\base\controllers\backend\BaseController
+class FormsController extends \yii\web\Controller
 {
     /**
-     * {@inheritdoc}
+     * @var array List all actions to rule of access
      */
-    public function behaviors()
-    {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'delete' => ['POST'],
-                ],
-            ],
-        ];
-    }
-
+    protected $list_action = ['index', 'create', 'update', 'delete', 'list'];
+        
+    
+    /**
+     * @var string Prefix table (if you need storage data in SQL)
+     */
+        protected $table = 'poll_';
+        
+        public function behaviors() {
+            return [
+                'access' => [
+                        'class' => \yii\filters\AccessControl::className(),
+                        'only' => $this->list_action,
+                        'rules' => [
+                            [
+                                'allow' => true,
+                                'roles' => ['?'],
+                            ],
+                            [
+                                'allow' => true,
+                                'actions' => $this->list_action,
+                                'roles' => ['@'],
+                            ],
+                            
+                        ],
+                    ],
+                    'verbs' => [
+                        'class' => VerbFilter::className(),
+                        'actions' => [
+                            'delete' => ['post'],
+                        ],
+                    ],
+                ];
+            }
+            
     /**
      * Lists all Forms models.
      * @return mixed
@@ -52,49 +82,110 @@ class FormsController extends \kouosl\base\controllers\backend\BaseController
      */
     public function actionView($id)
     {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
+        $form = Forms::findModelByUrl($url);
+            $r = Yii::$app->request;
+    
+        
+            if ($r->isAjax && $r->isGet) {
+                echo $form->body;
+                return;
+    
+            }
+    
+    
+            if (($data = Yii::$app->request->post('DynamicModel')) !== null) {
+                
+                foreach ($data as $i => $v) {
+                    if (is_array($data[$i])) $data[$i] = join(',', $data[$i]);
+                }
+                
+                $query = Yii::$app->db->createCommand()->insert($this->table.$form->form_id, $data);
+                
+                if ($query->execute()){
+                    
+                    Yii::$app->session->setFlash('success', Yii::t('app', 'Registration successfully completed'));
+                    
+                    if (isset($data['email']) && isset(Json::decode($form->body)['response'])){
+                        Send::widget([
+                            'from' => 'info@seda.net',
+                            'to' => $data['email'],
+                            'subject' => Yii::t('app', 'Registration successfully completed'),
+                            'textBody' => Json::decode($form->body)['response'],
+                        ]);
+                    }
+                } else {
+                    Yii::$app->session->setFlash('error', Yii::t('app', 'An confirmation email was not sent'));
+                }
+                
+                return $this->redirect(['index']);
+            } else {
+                return $this->render('view', [ 'form' => $form->body] );
+            }
     }
 
-    /**
-     * Creates a new Forms model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
-     */
-    public function actionCreate()
-    {
-        $model = new Forms();
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->form_id]);
+  /**
+     * Create Controller.
+     *
+     * Create form - FormBuilder
+     * @return Void View
+    */   	
+    public function actionCreate(){
+        
+        $r = Yii::$app->request;
+        
+         if ($r->isAjax && $r->post('form_data')) {
+         
+             $form = new FormBuilder(['table' => $this->table]);
+             $form->load($r->post());
+            $form->save();
+            $form->createTable();
+     return $form->response();
+            
+        } else {
+            return $this->render('create');
         }
-
-        return $this->render('create', [
-            'model' => $model,
-        ]);
     }
-
-    /**
-     * Updates an existing Forms model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionUpdate($id)
-    {
-        $model = $this->findModel($id);
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->form_id]);
+/**
+     * Update Controller.
+     *
+     * Update form - FormBuilder
+     * @return Void View
+    */   
+    public function actionUpdate($id){
+       
+        $form = new FormBuilder(['table' => $this->table.$id]);
+        $form->findModel($id);
+        $r = Yii::$app->request;
+        
+        if ($r->isAjax) {
+            \Yii::$app->response->format = 'json';
+            
+            switch (true) { 
+                case $r->isGet: 
+                    echo $form->model->body; break;
+                
+                case $r->post('form_data'): 
+                    
+                    $form->load($r->post());
+                    
+                    return ['success' => $form->save()]; 
+                
+                case $r->post('add'):
+                    return ['success' => $form->addColumn($r->post('add'))];
+                
+                case $r->post('delete'):
+                    return ['success' => $form->dropColumn($r->post('delete'))];
+                
+                case $r->post('change'):
+                    return ['success' => $form->renameColumn($r->post('change'))];
+                              
+                default: return ['success' => false];
+            }
+            
+        } else {
+            return $this->render('update', ['id' => $id]);
         }
-
-        return $this->render('update', [
-            'model' => $model,
-        ]);
     }
-
     /**
      * Deletes an existing Forms model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
@@ -104,14 +195,14 @@ class FormsController extends \kouosl\base\controllers\backend\BaseController
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
-
-        return $this->redirect(['index']);
+        $form = new FormBuilder();
+            $form->model->findModel($id)->delete();
+            return $this->redirect(['index']);
     }
-   /* public function actionList($id) {
+    public function actionList($id) {
         
         $query = (new \yii\db\Query)->from($this->table.$id);
-        $form = FormModel::findModel($id);
+        $form = Forms::findModel($id);
         $array = Json::decode($form->body);
         
         $merge_array = FormBase::onlyCorrectDataFields($array['body']);
@@ -124,20 +215,6 @@ class FormsController extends \kouosl\base\controllers\backend\BaseController
             'only_data_fields' => ArrayHelper::getColumn($merge_array, 'name')
         ]);
     }
-    */
-    /**
-     * Finds the Forms model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param integer $id
-     * @return Forms the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    protected function findModel($id)
-    {
-        if (($model = Forms::findOne($id)) !== null) {
-            return $model;
-        }
-
-        throw new NotFoundHttpException('The requested page does not exist.');
-    }
+    
+    
 }
