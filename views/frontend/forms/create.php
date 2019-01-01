@@ -5,16 +5,13 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model kouosl\forms\models\Forms */
 
-$this->title = 'Create Forms';
-$this->params['breadcrumbs'][] = ['label' => 'Forms', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
+$this->title = 'Form generator Yii2';
+$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Forms') , 'url' => ['index']];
+$this->params['breadcrumbs'][] = Yii::t('app', 'Form create');
+
+
+echo \kouosl\forms\FormBuilder::widget([
+		'test_mode' => false,
+		'easy_mode' => true
+]);
 ?>
-<div class="forms-create">
-
-    <h1><?= Html::encode($this->title) ?></h1>
-
-    <?= $this->render('_form', [
-        'model' => $model,
-    ]) ?>
-
-</div>
