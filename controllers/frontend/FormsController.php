@@ -23,7 +23,7 @@ use yii\helpers\ArrayHelper;
  */
 class FormsController extends \yii\web\Controller
 {
-   /**
+    /**
      * @var array List all actions to rule of access
      */
     protected $list_action = ['index', 'create', 'update', 'delete', 'list'];
@@ -61,32 +61,31 @@ class FormsController extends \yii\web\Controller
                 ];
             }
             
-      /**
+    /**
      * Index Controller.
      *
      * List of all forms
      * @return Void View
     */
-    public function actionIndex()
-    {
-        $searchModel = new FormsSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
-    }
-
-    /**
+        public function actionIndex(){
+            $searchModel = new FormsSearch();
+            $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+    
+            return $this->render('index', [
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+            ]);
+        }
+        
+     /**
      * View Controller.
      *
      * Preview form.
      * @return Void View
-    */
-    public function actionView($id)
-    {
-        $form = Forms::findModelByUrl($url);
+    */   
+        public function actionView($url) {
+        
+            $form = Forms::findModelByUrl($url);
             $r = Yii::$app->request;
     
         
@@ -125,100 +124,107 @@ class FormsController extends \yii\web\Controller
             } else {
                 return $this->render('view', [ 'form' => $form->body] );
             }
-    }
-
-  /**
+        }
+        
+     /**
+     * List Controller.
+     *
+     * List of data from submited forms.
+     * @return Void View
+    */   	
+        public function actionList($id) {
+        
+            $query = (new \yii\db\Query)->from($this->table.$id);
+            $form = Forms::findModel($id);
+            $array = Json::decode($form->body);
+            
+            $merge_array = FormBase::onlyCorrectDataFields($array['body']);
+            
+            $dataProvider = new \yii\data\ActiveDataProvider(['query' => $query]);
+            
+             return $this->render('list', [
+             //   'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+                'only_data_fields' => ArrayHelper::getColumn($merge_array, 'name')
+            ]);
+        }
+        
+     /**
      * Create Controller.
      *
      * Create form - FormBuilder
      * @return Void View
     */   	
-    public function actionCreate(){
+        public function actionCreate(){
         
-        $r = Yii::$app->request;
-        
-         if ($r->isAjax && $r->post('form_data')) {
-         
-             $form = new FormBuilder(['table' => $this->table]);
-             $form->load($r->post());
-            $form->save();
-            $form->createTable();
-     return $form->response();
+            $r = Yii::$app->request;
             
-        } else {
-            return $this->render('create');
+             if ($r->isAjax && $r->post('form_data')) {
+             
+                 $form = new FormBuilder(['table' => $this->table]);
+                 $form->load($r->post());
+                $form->save();
+                $form->createTable();
+         return $form->response();
+                
+            } else {
+                return $this->render('create');
+            }
         }
-    }
-/**
+    
+    /**
      * Update Controller.
      *
      * Update form - FormBuilder
      * @return Void View
     */   
-    public function actionUpdate($id){
+     public function actionUpdate($id){
        
-        $form = new FormBuilder(['table' => $this->table.$id]);
-        $form->findModel($id);
-        $r = Yii::$app->request;
-        
-        if ($r->isAjax) {
-            \Yii::$app->response->format = 'json';
+            $form = new FormBuilder(['table' => $this->table.$id]);
+            $form->findModel($id);
+            $r = Yii::$app->request;
             
-            switch (true) { 
-                case $r->isGet: 
-                    echo $form->model->body; break;
+            if ($r->isAjax) {
+                \Yii::$app->response->format = 'json';
                 
-                case $r->post('form_data'): 
+                switch (true) { 
+                    case $r->isGet: 
+                        echo $form->model->body; break;
                     
-                    $form->load($r->post());
+                    case $r->post('form_data'): 
+                        
+                        $form->load($r->post());
+                        
+                        return ['success' => $form->save()]; 
                     
-                    return ['success' => $form->save()]; 
+                    case $r->post('add'):
+                        return ['success' => $form->addColumn($r->post('add'))];
+                    
+                    case $r->post('delete'):
+                        return ['success' => $form->dropColumn($r->post('delete'))];
+                    
+                    case $r->post('change'):
+                        return ['success' => $form->renameColumn($r->post('change'))];
+                                  
+                    default: return ['success' => false];
+                }
                 
-                case $r->post('add'):
-                    return ['success' => $form->addColumn($r->post('add'))];
-                
-                case $r->post('delete'):
-                    return ['success' => $form->dropColumn($r->post('delete'))];
-                
-                case $r->post('change'):
-                    return ['success' => $form->renameColumn($r->post('change'))];
-                              
-                default: return ['success' => false];
+            } else {
+                return $this->render('update', ['id' => $id]);
             }
-            
-        } else {
-            return $this->render('update', ['id' => $id]);
         }
-    }
+    
     /**
-     * Deletes an existing Forms model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionDelete($id)
-    {
-        $form = new FormBuilder();
+     * Delete Controller.
+     *
+     * Delete form
+     * @return Void Redirect to index controller
+    */  
+        public function actionDelete($id){
+            $form = new FormBuilder();
             $form->model->findModel($id)->delete();
             return $this->redirect(['index']);
-    }
-    public function actionList($id) {
-        
-        $query = (new \yii\db\Query)->from($this->table.$id);
-        $form = Forms::findModel($id);
-        $array = Json::decode($form->body);
-        
-        $merge_array = FormBase::onlyCorrectDataFields($array['body']);
-        
-        $dataProvider = new \yii\data\ActiveDataProvider(['query' => $query]);
-        
-         return $this->render('list', [
-         //   'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-            'only_data_fields' => ArrayHelper::getColumn($merge_array, 'name')
-        ]);
-    }
+        }
     
     
    
