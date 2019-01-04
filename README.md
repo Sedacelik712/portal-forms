@@ -1,5 +1,6 @@
 # portal-forms
 Assets ve FormBase kısımları için kaynak:https://github.com/pceuropa/yii2-forms
+
 indirmek için:
 composer require Sedacelik712/portal-forms
 
