@@ -14,7 +14,7 @@ use yii\web\HttpException;
  */
 class Module extends \yii\base\Module
 {
-    public $controllerNamespace = 'kouosl\forms\controllers';
+    public $controllerNamespace = 'kouosl\forms\controllers\backend';
     public $defaultRoute = 'forms';
     public $table;
     public function init()
