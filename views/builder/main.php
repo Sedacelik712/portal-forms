@@ -1,6 +1,6 @@
 <?php
 use yii\helpers\Json;
-kouosl\forms\FormBuilderAsset::register($this);
+kouosl\forms\bundles\FormBuilderAsset::register($this);
 ?>
 <div id="MyForm" class="row">
 
