@@ -28,7 +28,7 @@ kouosl database de tablo oluşturup kaydedebiliyor.
 
 Ana sayfa:
 
-![m](https://user-images.githubusercontent.com/38867574/50660254-30dd9700-0fb0-11e9-87e2-c4592fbb759c.png)
+![dd](https://user-images.githubusercontent.com/38867574/50725692-7914ca80-1112-11e9-815c-23652487b224.png)
 
 Create Form butonuna basınca:
 
