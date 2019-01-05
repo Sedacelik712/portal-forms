@@ -9,15 +9,14 @@ use kouosl\forms\models\FormsSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-use kouosl\forms\FormBase;
-use kouosl\forms\Form;
-use kouosl\forms\FormBuilder;
+use kouosl\forms\helpers\FormBase;
+use kouosl\forms\widgets\Form;
+use kouosl\forms\widgets\FormBuilder;
 use kouosl\forms\email\Send;
 use yii\helpers\Url;
 use yii\web\Response;
 use yii\helpers\Json;
 use yii\helpers\ArrayHelper;
-
 /**
  * FormsController implements the CRUD actions for Forms model.
  */
@@ -226,6 +225,4 @@ class FormsController extends \yii\web\Controller
             return $this->redirect(['index']);
         }
     
-    
-   
 }
