@@ -1,6 +1,6 @@
 <?php
 
-namespace kouosl\forms\controllers;
+namespace kouosl\forms\controllers\backend;
 
 use Yii;
 use kouosl\forms\models\Forms;
@@ -8,9 +8,9 @@ use kouosl\forms\models\FormsSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-use kouosl\forms\FormBase;
-use kouosl\forms\Form;
-use kouosl\forms\FormBuilder;
+use kouosl\forms\helpers\FormBase;
+use kouosl\forms\widgets\Form;
+use kouosl\forms\widgets\FormBuilder;
 use kouosl\forms\email\Send;
 use yii\helpers\Url;
 use yii\web\Response;
@@ -21,7 +21,6 @@ use yii\helpers\ArrayHelper;
  */
 class FormsController extends \yii\web\Controller
 {
- 
     /**
      * @var array List all actions to rule of access
      */
