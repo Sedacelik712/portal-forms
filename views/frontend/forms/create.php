@@ -10,7 +10,7 @@ $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Forms') , 'url' => [
 $this->params['breadcrumbs'][] = Yii::t('app', 'Form create');
 
 
-echo \kouosl\forms\FormBuilder::widget([
+echo \kouosl\forms\widgets\FormBuilder::widget([
 		'test_mode' => false,
 		'easy_mode' => true
 ]);
