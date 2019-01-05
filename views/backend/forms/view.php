@@ -9,7 +9,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <h1><?= Html::encode($this->title) ?>:</h1><hr>
 
 <?php
-echo \kouosl\forms\Form::widget([
+echo \kouosl\forms\widgets\Form::widget([
 	'form' => $form,
 	'typeRender' => 'php'
 ]);
