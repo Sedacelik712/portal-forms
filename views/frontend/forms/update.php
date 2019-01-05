@@ -5,7 +5,7 @@ $this->title = Yii::t('app', 'form update') ;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Forms list') , 'url' => ['index']];
 $this->params['breadcrumbs'][] =  $this->title;
 
-echo \kouosl\forms\FormBuilder::widget([
+echo \kouosl\forms\widgets\FormBuilder::widget([
 	'table' => 'poll_',     // 'form_' . $id
 	'config' => [
 			'get'=> true, 
