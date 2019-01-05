@@ -6,11 +6,14 @@ use yii\helpers\Html;
 $this->title = 'FormBuilder';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-
+<style type="text/css">
+.btn-black{background-color:#6C006C;color: #FFF;}
+    .btn-black:hover{color: #FFF;}
+</style>
 <h1><?= Yii::t('app', 'FormBuilder') ?></h1>
 
 
-	<?= Html::a(Yii::t('app', 'Create form'), ['create'], ['class' => 'btn btn-success']) ?>
+	<?= Html::a(Yii::t('app', 'Create form'), ['create'], ['class'=>'btn btn-black']) ?>
 	
    <?= \yii\grid\GridView::widget([
         'dataProvider' => $dataProvider,
@@ -30,10 +33,10 @@ $this->params['breadcrumbs'][] = $this->title;
             
             'buttons' => [
 		        'view' => function ($url, $model, $key) {
-					return Html::a ( '<span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> ', ['forms/view', 'url' => $model->url] );
+					return Html::a ( '<span class="glyphicon glyphicon-eye-open" style="color:red" aria-hidden="true"></span> ', ['forms/view', 'url' => $model->url] );
 				},
 		        'list' => function ($url, $model, $key) {
-					return Html::a ( '<span class="glyphicon glyphicon-th-list" aria-hidden="true"></span> ', ['forms/list', 'id' => $model->form_id] );
+					return Html::a ( '<span class="glyphicon glyphicon-th-list" style="color:red" aria-hidden="true"></span> ', ['forms/list', 'id' => $model->form_id] );
 				},
             ],
 			'template' => '{update} {view} {delete} {list}'
